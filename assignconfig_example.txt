@@ -1,0 +1,22 @@
+[DEFAULT]
+# Customize these values to match a specific assignment in an assignment sequence.
+# Examples are shown below for an example course.  You will need to customize with your course information here.
+# The github classroom name, should match your github.com/XXXX/ URL
+GITHUB_CLASSROOM=CU-ECEN-5823
+# true if this assignment starts with the content of the previous assignment.
+# false if it starts with assign_base base repo (which will be true for the first assignment in a series)
+STARTS_WITH_PREV_ASSIGN=False
+# The assignment number reference for the current assignment, and name of github classroom created repo
+# will be the prefix for each student repository)
+NUMBER_CURRENT=10
+NAME_CURRENT=assignment-10-bluetooth-mesh
+# The base repo, for the first assignment, used when starts_with_prev_assign is False
+BASE_REPO=ecen5823-btmesh-node
+# The branch of the base repo used for the first assignment
+BASE_REPO_BRANCH=assignment-10-base
+# The assignment number reference for the previous assignment, and prefix to github classroom created repo.
+# Used when starts_with_prev_assign is true
+NUMBER_PREV=8
+# The name of the previous assignment, as set in github classroom.
+# Used when starts_with_prev_assign is false
+NAME_PREV=assignment-8-bluetooth-ble-mitm-pairing-server
