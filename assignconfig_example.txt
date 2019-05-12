@@ -1,22 +1,28 @@
 [DEFAULT]
 # Customize these values to match a specific assignment in an assignment sequence.
 # Examples are shown below for an example course.  You will need to customize with your course information here.
-# The github classroom name, should match your github.com/XXXX/ URL
-GITHUB_CLASSROOM=CU-ECEN-5823
+# The github classroom name, should match your github.com/XXXX/ URL (for instance CU-ECEN-5823)
+GITHUB_CLASSROOM=YOUR-CLASSROOM-NAME
 # true if this assignment starts with the content of the previous assignment.
 # false if it starts with assign_base base repo (which will be true for the first assignment in a series)
-STARTS_WITH_PREV_ASSIGN=False
+STARTS_WITH_PREV_ASSIGN=false
 # The assignment number reference for the current assignment, and name of github classroom created repo
 # will be the prefix for each student repository)
-NUMBER_CURRENT=10
-NAME_CURRENT=assignment-10-bluetooth-mesh
-# The base repo, for the first assignment, used when starts_with_prev_assign is False
-BASE_REPO=ecen5823-btmesh-node
+NUMBER_CURRENT=1
+NAME_CURRENT=assignment-1-name
+# The full name for the base repo used for the first assignment.  Used when starts_with_prev_assign is false
+BASE_REPO=assignment-base-repository
 # The branch of the base repo used for the first assignment
-BASE_REPO_BRANCH=assignment-10-base
+# This might be useful if you create different branches for each assignment in the base assignment repo.  Or you
+# might just use the master branch for all assignments
+BASE_REPO_BRANCH=master
 # The assignment number reference for the previous assignment, and prefix to github classroom created repo.
 # Used when starts_with_prev_assign is true
-NUMBER_PREV=8
+# When you create a new assignment you will typically want to set STARTS_WITH_PREV_ASSIGN=true, NUMBER_CURRENT to the current assignment
+# and NUMBER_PREV to the previous assignment.  This will setup pull requests between the previous assignment and current assignment
+# in each student's github repository.  So assuming assignment 2 builds on assignment 1, assignment 2 will use NUMBER_CURRENT=2 AND
+# NUMBER_PREV=1
+NUMBER_PREV=1
 # The name of the previous assignment, as set in github classroom.
-# Used when starts_with_prev_assign is false
-NAME_PREV=assignment-8-bluetooth-ble-mitm-pairing-server
+# Used when starts_with_prev_assign is true (and used to find each student's repository related to the previous assignment)
+NAME_PREV=assignment-prev-name
