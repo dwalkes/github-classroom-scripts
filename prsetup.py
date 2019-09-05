@@ -1,4 +1,4 @@
-# Python 3
+#!/usr/bin/python3
 import subprocess
 import webbrowser
 import traceback
@@ -53,11 +53,8 @@ def read_roster_students(csv_file):
     '''
     csv_reader=csv.DictReader(csv_file)
     students=[]
-    line_count=0
     for row in csv_reader:
-        if line_count > 0:
-            students.append(row["github_username"])
-        line_count = line_count+1
+        students.append(row["github_username"])
     return students
 
 def get_roster_students():
@@ -89,7 +86,7 @@ def create_remote_if_not_existing(name,remote_url):
 def checkout_and_track_or_update(remote,local_branch,remote_branch):
     branches=cmd(["git", "branch"])
     cmd(["git", "fetch", remote])
-    if branches.find(local_branch) == -1:
+    if branches.find(local_branch) != 0:
         cmd(["git", "fetch", remote, remote_branch+":"+local_branch])
 
 def delete_local_if_exists(local_branch):
@@ -119,7 +116,7 @@ if args.dry_run:
 students = get_roster_students()
 
 if len(students) == 0:
-    print("No students defined, check the format of student_list/classroom_roster.csv")
+    print("No students defined, check the format of " + CLASSROSTER_FILE )
     exit(1)
 
 for student in students:
@@ -128,10 +125,14 @@ for student in students:
             assign_prev_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_PREV"]) + "_remote"
             assign_prev_branch = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_PREV"]) + "_submission"
             assign_base_repo_full = assign_name_git_url_prefix+assign["DEFAULT"]["NAME_PREV"]+"-"+student+".git"
+            assign_prev_remote_branch = "master"
         else:
             assign_prev_remote = assign["DEFAULT"]["BASE_REPO"]
             assign_prev_branch = assign["DEFAULT"]["BASE_REPO_BRANCH"]
             assign_base_repo_full = assign_name_git_url_prefix+assign["DEFAULT"]["BASE_REPO"] +".git"
+            assign_prev_remote_branch = assign_prev_branch
+            print("checking out and tracking " + assign_prev_branch + " from " + assign_prev_remote + " " + assign_prev_remote_branch)
+            checkout_and_track_or_update(assign_prev_remote,assign_prev_branch,assign_prev_remote_branch)
 
         assign_current_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_remote"
         assign_current_branch = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_submission"
@@ -145,10 +146,10 @@ for student in students:
                                                 + "-" + student + ".git")
             cmd(["git","fetch",assign_prev_remote])
             cmd(["git", "fetch",assign_current_remote])
-            checkout_and_track_or_update(assign_prev_remote,assign_prev_branch,"master")
+            checkout_and_track_or_update(assign_prev_remote,assign_prev_branch,assign_prev_remote_branch)
             checkout_and_track_or_update(assign_current_remote,assign_current_branch,"master")
         if args.push_remote:
-            push_local_branch_to_remote_check_if_exists(assign_current_remote,assign_prev_branch)
+            push_local_branch_to_remote_check_if_exists(assign_current_remote,assign_prev_remote_branch)
             push_local_branch_to_remote_check_if_exists(assign_current_remote,assign_current_branch)
         if args.open_pr_page:
             open_browser_at_url("https://github.com/" + assign['DEFAULT']['GITHUB_CLASSROOM'] +"/" +
