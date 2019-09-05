@@ -6,18 +6,18 @@ It was originally developed for use in University of Colorado course
 [ECEN 5823](https://sites.google.com/colorado.edu/ecen5823/home).
 
 # Using These Scripts
-1. Add this repository as a git submodule on a repository used by instructors/student assistants for assignment grading.
+1. Add this repository as a git submodule on a parent repository used by instructors/student assistants for assignment grading.
   This would typically be a private repository which contains completed assignments for reference by instructors and
    teaching assistants.
 2. Add a scripts_config/classroom_roster.csv file in the parent repository containing the list of students exported from
-the Roster Mangement->Download section of your GitHub classroom.  You may need to prune this to remove teaching
+the Roster Mangement->Download section of your GitHub classroom, where the scripts_config folder is at the same directory as the github-classroom-scripts submodule folder.  You may need to prune this to remove teaching
 assistants and yourself from the list, as well as any students who haven't actually submitted an assignment
 (perhaps dropped the course).  Make sure you check this into a private repository to avoid sharing student information
 publicly.
 3. Setup your assignment and GithubClassroom using a scripts_config/assignconfig.txt file.  An example config file is
 provided in the assignconfig_example.txt file.
-4. Run ```pip install -r requirements.txt``` to install requirements in your python environment
-5. Run the scripts from the base directory using python github-classroom-scripts/scriptname.py so the script will work
+4. Run ```pip3 install -r requirements.txt``` to install requirements in your python3 environment
+5. Run the scripts from the base directory using ```./github-classroom-scripts/scriptname.py``` so the script will work
  on the parent repository and find the roster file and assignconfig.txt file, also so the git commands will work on the
  appropriate repository.
 
