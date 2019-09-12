@@ -40,6 +40,9 @@ parser.add_argument('--no_open_pr_page',dest='open_pr_page', action='store_false
                         help='Skip opening pull request webpages for each student')
 parser.add_argument('--force_push',dest='force_push', action='store_true', default=False,
                         help='force push to remote repository, to unconditionally update content there')
+parser.add_argument('--first_student',dest='first_student', action='store_true', default=False,
+                        help='Stop after the first student')
+
 
 args = parser.parse_args()
 
@@ -119,21 +122,24 @@ if len(students) == 0:
     print("No students defined, check the format of " + CLASSROSTER_FILE )
     exit(1)
 
+if args.first_student:
+    print("Truncating the list to only use the first student")
+    del students[1:]
+
 for student in students:
     try:
         if assign.getboolean('DEFAULT','STARTS_WITH_PREV_ASSIGN'):
             assign_prev_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_PREV"]) + "_remote"
             assign_prev_branch = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_PREV"]) + "_submission"
             assign_base_repo_full = assign_name_git_url_prefix+assign["DEFAULT"]["NAME_PREV"]+"-"+student+".git"
-            assign_prev_remote_branch = "master"
         else:
             assign_prev_remote = assign["DEFAULT"]["BASE_REPO"]
             assign_prev_branch = assign["DEFAULT"]["BASE_REPO_BRANCH"]
             assign_base_repo_full = assign_name_git_url_prefix+assign["DEFAULT"]["BASE_REPO"] +".git"
-            assign_prev_remote_branch = assign_prev_branch
             print("checking out and tracking " + assign_prev_branch + " from " + assign_prev_remote + " " + assign_prev_remote_branch)
             checkout_and_track_or_update(assign_prev_remote,assign_prev_branch,assign_prev_remote_branch)
 
+        assign_prev_remote_branch = assign_prev_branch
         assign_current_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_remote"
         assign_current_branch = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_submission"
         if args.delete_local:

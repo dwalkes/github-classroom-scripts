@@ -23,6 +23,13 @@ provided in the assignconfig_example.txt file.
 
 See sections below for individual script details.
 
+## SSH Agent
+To avoid the need to re-enter credentials, use this script with an ssh agent and your authorized key
+```
+eval `ssh-agent`
+ssh-add /path/to/key
+```
+
 ## prsetup.py
 
 This script works with an assignment series where assignments start with a base set of code and then build on each
