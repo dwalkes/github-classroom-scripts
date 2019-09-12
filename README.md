@@ -51,3 +51,18 @@ button on this page creates a pull request.
 Start by editing the variables at the top of the script to point to your github classroom page and assignments.
 
 Run the script with no arguments for usage instructions.
+
+Typically the first person on the team who runs this script would run:
+```
+./github-classroom-scripts/prsetup.py --create_local --push_remote
+```
+To both create local repositories to track student assignments as well as update remote branches on github.  This person would also use the opened PR pages to create pull requests.
+
+The next people on the team would run
+```
+./github-classroom-scripts/prsetup.py --create_local
+```
+To create their local repositories, and the script would open browser pages to each pull request.
+
+If you've already created the local repositories and remote repositories for a given assignment and just want to open pull request pages, run with no command arguments.
+
