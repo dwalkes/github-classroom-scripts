@@ -136,8 +136,6 @@ for student in students:
             assign_prev_remote = assign["DEFAULT"]["BASE_REPO"]
             assign_prev_branch = assign["DEFAULT"]["BASE_REPO_BRANCH"]
             assign_base_repo_full = assign_name_git_url_prefix+assign["DEFAULT"]["BASE_REPO"] +".git"
-            print("checking out and tracking " + assign_prev_branch + " from " + assign_prev_remote + " " + assign_prev_remote_branch)
-            checkout_and_track_or_update(assign_prev_remote,assign_prev_branch,assign_prev_remote_branch)
 
         assign_prev_remote_branch = assign_prev_branch
         assign_current_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_remote"
