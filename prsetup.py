@@ -42,6 +42,8 @@ parser.add_argument('--force_push',dest='force_push', action='store_true', defau
                         help='force push to remote repository, to unconditionally update content there')
 parser.add_argument('--first_student',dest='first_student', action='store_true', default=False,
                         help='Stop after the first student')
+parser.add_argument('--one_student',help='Use a single github student ID for update')
+
 
 
 args = parser.parse_args()
@@ -125,6 +127,10 @@ if len(students) == 0:
 if args.first_student:
     print("Truncating the list to only use the first student")
     del students[1:]
+
+if args.one_student:
+    print("Updating only student " + args.one_student)
+    students = [ args.one_student ]
 
 for student in students:
     try:
