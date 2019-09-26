@@ -92,7 +92,7 @@ def checkout_and_track_or_update(remote,local_branch,remote_branch):
     branches=cmd(["git", "branch"])
     cmd(["git", "fetch", remote])
     if branches.find(local_branch) != 0:
-        cmd(["git", "fetch", remote, remote_branch+":"+local_branch])
+        cmd(["git", "fetch", "--recurse-submodules=no", remote, remote_branch+":"+local_branch])
 
 def delete_local_if_exists(local_branch):
     branches=cmd(["git", "branch"])
@@ -138,12 +138,13 @@ for student in students:
             assign_prev_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_PREV"]) + "_remote"
             assign_prev_branch = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_PREV"]) + "_submission"
             assign_base_repo_full = assign_name_git_url_prefix+assign["DEFAULT"]["NAME_PREV"]+"-"+student+".git"
+            assign_prev_remote_branch_local_name = assign_prev_branch
         else:
             assign_prev_remote = assign["DEFAULT"]["BASE_REPO"]
             assign_prev_branch = assign["DEFAULT"]["BASE_REPO_BRANCH"]
             assign_base_repo_full = assign_name_git_url_prefix+assign["DEFAULT"]["BASE_REPO"] +".git"
+            assign_prev_remote_branch_local_name = "assignment" + str(assign["DEFAULT"]["NUMBER_PREV"]) + "_base"
 
-        assign_prev_remote_branch = assign_prev_branch
         assign_current_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_remote"
         assign_current_branch = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_submission"
         if args.delete_local:
@@ -154,17 +155,17 @@ for student in students:
             create_remote_if_not_existing(assign_current_remote,
                                           assign_name_git_url_prefix + assign["DEFAULT"]["NAME_CURRENT"]
                                                 + "-" + student + ".git")
-            cmd(["git","fetch",assign_prev_remote])
-            cmd(["git", "fetch",assign_current_remote])
-            checkout_and_track_or_update(assign_prev_remote,assign_prev_branch,assign_prev_remote_branch)
+            cmd(["git","fetch","--recurse-submodules=no",assign_prev_remote])
+            cmd(["git","fetch","--recurse-submodules=no",assign_current_remote])
+            checkout_and_track_or_update(assign_prev_remote,assign_prev_remote_branch_local_name,assign_prev_branch)
             checkout_and_track_or_update(assign_current_remote,assign_current_branch,"master")
         if args.push_remote:
-            push_local_branch_to_remote_check_if_exists(assign_current_remote,assign_prev_remote_branch)
+            push_local_branch_to_remote_check_if_exists(assign_current_remote,assign_prev_remote_branch_local_name)
             push_local_branch_to_remote_check_if_exists(assign_current_remote,assign_current_branch)
         if args.open_pr_page:
             open_browser_at_url("https://github.com/" + assign['DEFAULT']['GITHUB_CLASSROOM'] +"/" +
                                 assign['DEFAULT']['NAME_CURRENT'] + "-" +
-                                student + "/compare/"+assign_prev_branch+"..."+assign_current_branch+"?expand=1")
+                                student + "/compare/"+assign_prev_remote_branch_local_name+"..."+assign_current_branch+"?expand=1")
     except Exception as err:
         print("Could not complete assignment PR setup for student {}".format(student))
         error_students[student]=str(err)+traceback.format_exc()
