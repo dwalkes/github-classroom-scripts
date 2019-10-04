@@ -99,11 +99,15 @@ def delete_local_if_exists(local_branch):
     if branches.find(local_branch):
         cmd(["git", "branch", '-D', local_branch])
 
-def push_local_branch_to_remote_check_if_exists(remote,local_and_remote_branchname):
+def remote_branch_exists(remote,remote_branchname):
     exists=False
     remote_branches=cmd(["git", "branch", "-r"])
-    if remote_branches.find(remote+"/"+local_and_remote_branchname)!= -1 :
+    if remote_branches.find(remote+"/"+remote_branchname) == 0 :
         exists=True
+    return exists
+
+def push_local_branch_to_remote_check_if_exists(remote,local_and_remote_branchname):
+    exists=remote_branch_exists(remote,local_and_remote_branchname)
     if args.force_push:
         cmd(["git", "push", "-f", remote, local_and_remote_branchname])
     else:
@@ -157,6 +161,9 @@ for student in students:
                                                 + "-" + student + ".git")
             cmd(["git","fetch","--recurse-submodules=no",assign_prev_remote])
             cmd(["git","fetch","--recurse-submodules=no",assign_current_remote])
+            if not remote_branch_exists(assign_prev_remote,assign_prev_branch):
+                # This supports starting midway through the semester when a previous assignment in the series hasn't used the submission script
+                assign_prev_branch="master"
             checkout_and_track_or_update(assign_prev_remote,assign_prev_remote_branch_local_name,assign_prev_branch)
             checkout_and_track_or_update(assign_current_remote,assign_current_branch,"master")
         if args.push_remote:
