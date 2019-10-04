@@ -5,6 +5,16 @@ This is especially true for courses which use assignment series, where one assig
 It was originally developed for use in University of Colorado course
 [ECEN 5823](https://sites.google.com/colorado.edu/ecen5823/home).
 
+# Running on Windows
+
+Ensure you have [Python 3](https://www.python.org/downloads/windows/) installed and in your PATH or run with the full path to the python 3 interpreter.  Execute using
+```
+python ./github-classroom-scripts/pr-setup.py
+```
+or subtitute the python command with the path to your Python 3 interpreter.
+If you need to support multiple python environments you may also consider [anaconda](https://virtualenv.pypa.io/en/latest/) or [virtualenv](https://virtualenv.pypa.io/en/latest/)
+
+
 # Using These Scripts
 1. Add this repository as a git submodule on a parent repository used by instructors/student assistants for assignment grading.
   This would typically be a private repository which contains completed assignments for reference by instructors and
@@ -17,11 +27,11 @@ publicly.
 3. Setup your assignment and GithubClassroom using a scripts_config/assignconfig.txt file.  An example config file is
 provided in the assignconfig_example.txt file.
 4. Run ```pip3 install -r requirements.txt``` to install requirements in your python3 environment
-5. Run the scripts from the base directory using ```./github-classroom-scripts/scriptname.py``` so the script will work
- on the parent repository and find the roster file and assignconfig.txt file, also so the git commands will work on the
- appropriate repository.
+5. Run the scripts from the base directory using ```./github-classroom-scripts/scriptname.py``` or ```python ./github-classroom-scripts/scriptname.py``` where python refers to a python 3 interpreter in your PATH.  You need to run from the base directory containing your scripts_config folder and *not* this folder, so the script can find the roster file and assignconfig.txt file, also so the git commands will work on the appropriate repository.
 
 See sections below for individual script details.
+
+
 
 ## SSH Agent
 To avoid the need to re-enter credentials, use this script with an ssh agent and your authorized key
