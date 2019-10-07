@@ -6,6 +6,9 @@ import argparse
 import sys
 import csv
 import configparser
+import pathlib
+import shutil
+
 assign = configparser.ConfigParser()
 
 ASSIGNCONFIG_FILE='scripts_config/assignconfig.txt'
@@ -43,6 +46,14 @@ parser.add_argument('--force_push',dest='force_push', action='store_true', defau
 parser.add_argument('--first_student',dest='first_student', action='store_true', default=False,
                         help='Stop after the first student')
 parser.add_argument('--one_student',help='Use a single github student ID for update')
+parser.add_argument('--test_script',dest='test_script',help='Run tests based on the passed script argument after cloning locally.  A log containing results will be written to ~/test_script_results/ based on the assignment/student name')
+parser.add_argument('--clone_dir',dest='clone_dir',help='Clone to the directory specified by clone_dir in individual student folders instead of the local git repo')
+parser.add_argument('--delete_clone_dir',dest='delete_clone_dir',action='store_true',default=False,
+                        help='Delete the clone directory created for the student inside clone_dir after sucessful completion (to save filesystem space)')
+parser.add_argument('--skip_first_student',dest='skip_first_student',action='store_true',default=False,
+                        help='Skip the first student')
+
+
 
 
 
@@ -136,7 +147,13 @@ if args.one_student:
     print("Updating only student " + args.one_student)
     students = [ args.one_student ]
 
+if args.skip_first_student:
+    print("Skipping the first student ")
+    students = students[1:]
+
+workdir = os.getcwd()
 for student in students:
+    os.chdir(workdir)
     try:
         if assign.getboolean('DEFAULT','STARTS_WITH_PREV_ASSIGN'):
             assign_prev_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_PREV"]) + "_remote"
@@ -151,14 +168,24 @@ for student in students:
 
         assign_current_remote = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_remote"
         assign_current_branch = student + "_assignment" + str(assign["DEFAULT"]["NUMBER_CURRENT"]) + "_submission"
+        assign_current_repo = assign_name_git_url_prefix + assign["DEFAULT"]["NAME_CURRENT"] + "-" + student + ".git"
+                                                
+        if args.clone_dir:
+            clone_path = args.clone_dir + os.path.sep + assign_current_remote
+            if os.path.exists(clone_path):
+                shutil.rmtree(clone_path)
+            pathlib.Path(clone_path).mkdir(parents=True, exist_ok=True)
+            print("Changing git directory to {}".format(clone_path))
+            os.chdir(clone_path)
+            cmd(["git", "init"])
+
         if args.delete_local:
             delete_local_if_exists(assign_current_branch)
         if args.create_local:
             create_remote_if_not_existing(assign_prev_remote,
                                           assign_base_repo_full)
             create_remote_if_not_existing(assign_current_remote,
-                                          assign_name_git_url_prefix + assign["DEFAULT"]["NAME_CURRENT"]
-                                                + "-" + student + ".git")
+                                          assign_current_repo)
             cmd(["git","fetch","--recurse-submodules=no",assign_prev_remote])
             cmd(["git","fetch","--recurse-submodules=no",assign_current_remote])
             if not remote_branch_exists(assign_prev_remote,assign_prev_branch):
@@ -173,6 +200,31 @@ for student in students:
             open_browser_at_url("https://github.com/" + assign['DEFAULT']['GITHUB_CLASSROOM'] +"/" +
                                 assign['DEFAULT']['NAME_CURRENT'] + "-" +
                                 student + "/compare/"+assign_prev_remote_branch_local_name+"..."+assign_current_branch+"?expand=1")
+
+        if args.test_script:
+            home = str(pathlib.Path.home())
+            test_script_dir = home + os.path.sep + "test_script_results"
+            if not os.path.exists(test_script_dir):
+                pathlib.Path(test_script_dir).mkdir(parents=True, exist_ok=True)
+            logfile_path = test_script_dir + os.path.sep + assign_current_remote + ".log"
+            logfile = open(logfile_path,"w") 
+            rc=0
+            testargs = [ args.test_script ]
+            cmd(['git','checkout',assign_current_branch])
+            if args.clone_dir:
+                os.chdir(workdir)
+                testargs.append(clone_path)
+
+            if not args.dry_run:
+                print("Running test script... this will take a long time to complete.  You can monitor status with tail -f {}".format(logfile_path))
+                rc = subprocess.call(testargs, stdout=logfile, stderr=logfile)
+            if not rc == 0:
+                raise Exception("Attempt to execute test script at {} failed with rc {}.  See log file at {} for details"
+                                .format(args.test_script,str(rc),logfile_path))
+
+        if len(students) > 0 and args.clone_dir and args.delete_clone_dir:
+            shutil.rmtree(clone_path)
+
     except Exception as err:
         print("Could not complete assignment PR setup for student {}".format(student))
         error_students[student]=str(err)+traceback.format_exc()
