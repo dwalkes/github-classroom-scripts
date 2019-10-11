@@ -113,7 +113,7 @@ def delete_local_if_exists(local_branch):
 def remote_branch_exists(remote,remote_branchname):
     exists=False
     remote_branches=cmd(["git", "branch", "-r"])
-    if remote_branches.find(remote+"/"+remote_branchname) == 0 :
+    if remote_branches.find(remote+"/"+remote_branchname) != -1:
         exists=True
     return exists
 
@@ -190,6 +190,7 @@ for student in students:
             cmd(["git","fetch","--recurse-submodules=no",assign_current_remote])
             if not remote_branch_exists(assign_prev_remote,assign_prev_branch):
                 # This supports starting midway through the semester when a previous assignment in the series hasn't used the submission script
+                print("Remote branch {} doesn't exist on remote {}, using master.".format(assign_prev_branch,assign_prev_remote))
                 assign_prev_branch="master"
             checkout_and_track_or_update(assign_prev_remote,assign_prev_remote_branch_local_name,assign_prev_branch)
             checkout_and_track_or_update(assign_current_remote,assign_current_branch,"master")
