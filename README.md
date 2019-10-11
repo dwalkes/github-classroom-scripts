@@ -76,3 +76,9 @@ To create their local repositories, and the script would open browser pages to e
 
 If you've already created the local repositories and remote repositories for a given assignment and just want to open pull request pages, run with no command arguments.
 
+### Late submissions/resubmissions
+
+If a student updates their repository after the deadline and requests an update for late submission credit, you can update their assignment using:
+```
+./github-classroom-scripts/prsetup.py --delete_local --create_local --push_remote --one_student <studentid>
+```
