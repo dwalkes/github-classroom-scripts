@@ -107,7 +107,7 @@ def checkout_and_track_or_update(remote,local_branch,remote_branch):
 
 def delete_local_if_exists(local_branch):
     branches=cmd(["git", "branch"])
-    if branches.find(local_branch):
+    if branches.find(local_branch) != -1:
         cmd(["git", "branch", '-D', local_branch])
 
 def remote_branch_exists(remote,remote_branchname):
@@ -171,13 +171,20 @@ for student in students:
         assign_current_repo = assign_name_git_url_prefix + assign["DEFAULT"]["NAME_CURRENT"] + "-" + student + ".git"
                                                 
         if args.clone_dir:
+            do_git_init=False
             clone_path = args.clone_dir + os.path.sep + assign_current_remote
-            if os.path.exists(clone_path):
+            if os.path.exists(clone_path) and args.delete_local:
                 shutil.rmtree(clone_path)
+
+            if not os.path.exists(clone_path):
+                do_git_init=True
+
             pathlib.Path(clone_path).mkdir(parents=True, exist_ok=True)
             print("Changing git directory to {}".format(clone_path))
             os.chdir(clone_path)
-            cmd(["git", "init"])
+
+            if do_git_init:
+                cmd(["git", "init"])
 
         if args.delete_local:
             delete_local_if_exists(assign_current_branch)
@@ -208,7 +215,7 @@ for student in students:
             if not os.path.exists(test_script_dir):
                 pathlib.Path(test_script_dir).mkdir(parents=True, exist_ok=True)
             logfile_path = test_script_dir + os.path.sep + assign_current_remote + ".log"
-            logfile = open(logfile_path,"w") 
+            logfile = open(logfile_path,"a")
             rc=0
             testargs = [ args.test_script ]
             cmd(['git','checkout',assign_current_branch])
