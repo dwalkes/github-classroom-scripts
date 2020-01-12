@@ -82,3 +82,13 @@ If a student updates their repository after the deadline and requests an update 
 ```
 ./github-classroom-scripts/prsetup.py --delete_local --create_local --push_remote --one_student <studentid>
 ```
+
+### Test Scripts
+
+Use the `--test_script` option with relative path to an executable to kick off a tests on each student repository, 
+recording the script execution success/failure status and writing output logs to the ~/test_script_results/ directory
+based on assignment and student name.
+
+This option is useful with the `--clone_dir` option which can be used to clone student repositories into individual directories.
+This way, when failures occur during the test run, it's possible to go into the directory under `--clone_dir` corresponding to
+the student's assignment and re-run any failing test scripts against the student's submission.
