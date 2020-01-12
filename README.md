@@ -91,4 +91,4 @@ based on assignment and student name.
 
 This option is useful with the `--clone_dir` option which can be used to clone student repositories into individual directories.
 This way, when failures occur during the test run, it's possible to go into the directory under `--clone_dir` corresponding to
-the student's assignment and re-run any failing test scripts against the student's submission.
+the student's assignment and re-run any failing test scripts against the student's submission.  When `--clone_dir` is specified, the path to the individual student's cloned repository will be passed as the first argument to the `--test_script`.
