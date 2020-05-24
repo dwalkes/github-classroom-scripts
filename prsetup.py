@@ -11,6 +11,7 @@ import shutil
 
 assign = configparser.ConfigParser()
 
+
 ASSIGNCONFIG_FILE='scripts_config/assignconfig.txt'
 CLASSROSTER_FILE='scripts_config/classroom_roster.csv'
 import os
@@ -52,12 +53,21 @@ parser.add_argument('--delete_clone_dir',dest='delete_clone_dir',action='store_t
                         help='Delete the clone directory created for the student inside clone_dir after sucessful completion (to save filesystem space)')
 parser.add_argument('--skip_first_student',dest='skip_first_student',action='store_true',default=False,
                         help='Skip the first student')
+parser.add_argument('--overlay_files',dest='overlay_files',
+                        help='Use this argument to specify use of OVERLAY_FILES, and specify the relative path (relative to script execution path) where these overlay files reside\n'+
+                        'When specified, the OVERLAY_FILES specified in the configuration file will be added to the repository in a new branch with overlay_ prefix before push_alternate or test_script steps and used for those steps')
+parser.add_argument('--push_alternate',dest='push_alternate',
+                        help='An alternate location to push the submission (pushed with --set-upstream option).  This is useful for creating a repository in a different location (like gitlab) based on the assignment content\n' +
+                        'specify the location prefix like git@gitlab.com:cu-ecen-aesd-student-assignments' )
+
+
 
 
 
 
 
 args = parser.parse_args()
+
 
 def read_roster_students(csv_file):
     '''
@@ -91,7 +101,7 @@ def cmd(cmdargs):
         print(*cmdargs)
         sys.stdout.flush()
     if not args.dry_run:
-        ret=str(subprocess.check_output(cmdargs))
+        ret=subprocess.check_output(cmdargs).decode('utf-8')
     return ret
 
 def create_remote_if_not_existing(name,remote_url):
@@ -125,6 +135,29 @@ def push_local_branch_to_remote_check_if_exists(remote,local_and_remote_branchna
         cmd(["git", "push", remote, local_and_remote_branchname])
     return exists
 
+def check_for_overlay(assign_current_branch):
+    '''@return either assign_current_branch or a branch which contains the overlay of assign_current_branch
+        and the OVERLAY_FILES specified in the configuration when --overlay_files is specified as a command
+        line option.
+        This function allows you to overlay private assignment content from the working branch of a private
+        repository over top of the student's submission, for instance to ensure a minimum amount of testing
+        is included.
+    '''
+    retbranch=assign_current_branch
+    assign_overlay_branch="overlay_"+assign_current_branch
+    if args.overlay_files:
+        if 'OVERLAY_FILES' in assign['DEFAULT']:
+            current_private_branch=cmd(["git", "branch","--show-current"]).rstrip("\r\n")
+            print("current private branch is {}".format(current_private_branch))
+            delete_local_if_exists(assign_overlay_branch)
+            cmd(["git","checkout","-b",assign_overlay_branch,assign_current_branch])
+            cmd(["git","-C",args.overlay_files,"checkout",current_private_branch,"--"]+assign['DEFAULT']['OVERLAY_FILES'].split())
+            cmd(["git","commit","-m","Add overlay files for test purposes from " + current_private_branch])
+            cmd(["git","checkout",current_private_branch])
+            retbranch=assign_overlay_branch
+        else:
+            print("overlay_files specified but no OVERLAY_FILES specified in config file.  Please define OVERLAY_FILES to use an overlay")
+    return retbranch
 
 def open_browser_at_url(url):
     if not args.dry_run:
@@ -210,6 +243,7 @@ for student in students:
                                 student + "/compare/"+assign_prev_remote_branch_local_name+"..."+assign_current_branch+"?expand=1")
 
         if args.test_script:
+            checkout_branch=check_for_overlay(assign_current_branch)
             home = str(pathlib.Path.home())
             test_script_dir = home + os.path.sep + "test_script_results"
             if not os.path.exists(test_script_dir):
@@ -218,7 +252,7 @@ for student in students:
             logfile = open(logfile_path,"a")
             rc=0
             testargs = [ args.test_script ]
-            cmd(['git','checkout',assign_current_branch])
+            cmd(['git','checkout',checkout_branch])
             if args.clone_dir:
                 os.chdir(workdir)
                 testargs.append(clone_path)
@@ -229,6 +263,11 @@ for student in students:
             if not rc == 0:
                 raise Exception("Attempt to execute test script at {} failed with rc {}.  See log file at {} for details"
                                 .format(args.test_script,str(rc),logfile_path))
+
+        if args.push_alternate:
+            push_from_branch=check_for_overlay(assign_current_branch)
+            # Create a new repo on the alternate with the same name as the github repo but with overlay content, if any
+            cmd(["git","push","--set-upstream",args.push_alternate + "/" + assign['DEFAULT']['NAME_CURRENT'] + "-" + student + ".git",push_from_branch+":"+"master"])
 
         if len(students) > 0 and args.clone_dir and args.delete_clone_dir:
             shutil.rmtree(clone_path)

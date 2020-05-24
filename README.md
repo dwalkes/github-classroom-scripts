@@ -82,6 +82,12 @@ If a student updates their repository after the deadline and requests an update 
 ```
 ./github-classroom-scripts/prsetup.py --delete_local --create_local --push_remote --one_student <studentid>
 ```
+### Overlays
+
+Use the `--overlay_files` option along with the OVERLAY_FILES section of the configuration to overlay files from the working branch of
+a private repo on top of the student submission in an overlay_<student_assignment_branch>.  The list of files specified in OVERLAY_FILES
+will be added in a new commit on top of the student submission, allowing for additional content like test scripts to be included or to
+ensure specific versions of repositories or submodules are used.
 
 ### Test Scripts
 
@@ -92,3 +98,9 @@ based on assignment and student name.
 This option is useful with the `--clone_dir` option which can be used to clone student repositories into individual directories.
 This way, when failures occur during the test run, it's possible to go into the directory under `--clone_dir` corresponding to
 the student's assignment and re-run any failing test scripts against the student's submission.  When `--clone_dir` is specified, the path to the individual student's cloned repository will be passed as the first argument to the `--test_script`.
+
+### Push Alternates
+Use the `--push_alternate` option to specify an alternate location to push with --set-upstream.  If specified, the assignment submission branch
+(or assignment submission branch overlay, if `--overlay_files`) will be pushed to a new repo, possibly creating it.
+This is useful with [gitlab push to create new project](https://docs.gitlab.com/ee/gitlab-basics/create-project.html#push-to-create-a-new-project) option,
+in the case you use gitlab repositories for CI or testing.
