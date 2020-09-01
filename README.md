@@ -40,6 +40,12 @@ eval `ssh-agent`
 ssh-add /path/to/key
 ```
 
+## push-to-gitlab.py
+
+This is a simple script that clones a repository from github classroom and pushes to gitlab, useful when you have
+gitlab-ci automated test configuration setup in gitlab.  See assignconfig_example_push_to_gitlab.txt for a simplifiled
+assignment config text file you can use to configure for this script.
+
 ## prsetup.py
 
 This script works with an assignment series where assignments start with a base set of code and then build on each

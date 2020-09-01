@@ -1,0 +1,16 @@
+[DEFAULT]
+# A list of files to overlay before running tests or pushing to an alternate
+# These are specified relative to the overlay-from directory specified on the command line
+OVERLAY_FILES=test.sh .gitlab-ci.yml private-test CMakeLists.txt assignment-autotest
+# Customize these values to match a specific assignment in an assignment sequence.
+# Examples are shown below for an example course.  You will need to customize with your course information here.
+# The github classroom name, should match your github.com/XXXX/ URL (for instance CU-ECEN-5823)
+GITHUB_CLASSROOM=cu-ecen-5013
+# The assignment number reference for the current assignment, and name of github classroom created repo
+# will be the prefix for each student repository)
+NUMBER_CURRENT=1
+NAME_CURRENT=assignment-1
+# The path to the gitlab URL used for assignment submissions
+# and destination for push with automated test suport
+PUSH_REPO=git@gitlab.com:cueng1/ese/aesd/f20-assignment-submissions
+OPEN_URL=https://gitlab.com/cueng1/ese/aesd/f20-assignment-submissions
