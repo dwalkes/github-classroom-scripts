@@ -6,10 +6,6 @@ OVERLAY_FILES=test.sh .gitlab-ci.yml private-test CMakeLists.txt assignment-auto
 # Examples are shown below for an example course.  You will need to customize with your course information here.
 # The github classroom name, should match your github.com/XXXX/ URL (for instance CU-ECEN-5823)
 GITHUB_CLASSROOM=cu-ecen-5013
-# The assignment number reference for the current assignment, and name of github classroom created repo
-# will be the prefix for each student repository)
-NUMBER_CURRENT=1
-NAME_CURRENT=assignment-1
 # The path to the gitlab URL used for assignment submissions
 # and destination for push with automated test suport
 PUSH_REPO=git@gitlab.com:cueng1/ese/aesd/f20-assignment-submissions

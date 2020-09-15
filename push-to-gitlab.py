@@ -37,6 +37,7 @@ parser.add_argument('--log_cmds',dest='log_cmds', action='store_true',  default=
 parser.add_argument('--first_student',dest='first_student', action='store_true', default=False,
                         help='Stop after the first student')
 parser.add_argument('--one_student',help='Use a single github student ID for update')
+parser.add_argument('--assignment_name',help='The assignment name to use for the assignment (from github classroom)')
 
 
 args = parser.parse_args()
@@ -94,11 +95,16 @@ if args.one_student:
     print("Updating only student " + args.one_student)
     students = [ args.one_student ]
 
+if args.assignment_name is None:
+    print("Please specfiy assignment name from github classroom")
+    exit(1)
+
+
 workdir = os.getcwd()
 for student in students:
     tmpdir=tempfile.mkdtemp()
     os.chdir(tmpdir)
-    reponame=assign["DEFAULT"]["NAME_CURRENT"]+"-"+student
+    reponame=args.assignment_name+"-"+student
     assign_submission_repo_full = assign_name_git_url_prefix+reponame+".git"
     assign_push_repo_full = assign["DEFAULT"]["PUSH_REPO"]+"/" + reponame+".git"
     try:
