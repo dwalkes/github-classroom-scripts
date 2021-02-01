@@ -110,7 +110,19 @@ for student in students:
     try:
         cmd(["git","clone",assign_submission_repo_full])
         os.chdir(reponame)
-        cmd(["git","push","--set-upstream",assign_push_repo_full,"master"])
+        try:
+            branchname = cmd(["git","for-each-ref","--format='%(refname:short)'","refs/heads"]).strip("\n")
+            print("Default branch is {}".format(branchname))
+            if "main" in branchname:
+                log = cmd(["git","log","--pretty=oneline"])
+                numcommits = len(log.split('\n'))
+                print("{} commits in {} branch".format(numcommits,branchname))
+                if numcommits < 4:
+                    print("Less than 4 commits in main branch, switching to master instead")
+                    cmd(["git","checkout","master"])
+        except CalledProcessError:
+            pass
+        cmd(["git","push","--set-upstream",assign_push_repo_full])
         shutil.rmtree(tmpdir)
         open_browser_at_url(assign['DEFAULT']['OPEN_URL'] +"/" + reponame)
 
